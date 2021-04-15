@@ -30,13 +30,14 @@ public class Tile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnMouseDown()
     {
         IncrementColorIndex();
         SetTileColor(colorIndex);
+        CheckMyNeighbours();
     }
     
     private void SetTileColor(int colorIndex)
@@ -57,4 +58,62 @@ public class Tile : MonoBehaviour
             colorIndex = 0;
         }
     }
+
+   public void CheckMyNeighbours()
+    {
+        //todo: loop dis
+
+        CheckNeighbour(Direction.NORTH);
+        CheckNeighbour(Direction.EAST);
+        CheckNeighbour(Direction.SOUTH);
+        CheckNeighbour(Direction.WEST);
+
+    }
+
+    public Color GetColor()
+    {
+        return colors[colorIndex];
+    }
+
+    private void CheckNeighbour(Direction direction)
+    {
+        Vector3 targetPosition = Vector3.zero;
+        RaycastHit raycastHit;
+        switch (direction)
+        {
+            case Direction.NORTH:
+                targetPosition = new Vector3(transform.position.x, transform.position.y + 3, transform.position.z);
+                break;
+            case Direction.EAST:
+                targetPosition = new Vector3(transform.position.x + 3, transform.position.y, transform.position.z);
+                break;
+            case Direction.SOUTH:
+                targetPosition = new Vector3(transform.position.x, transform.position.y - 3, transform.position.z);
+                break;
+            case Direction.WEST:
+                targetPosition = new Vector3(transform.position.x - 3, transform.position.y, transform.position.z);
+                break;
+        }
+
+        if (Physics.Linecast(transform.position, targetPosition, out raycastHit))
+        {
+            Tile tileHit = raycastHit.transform.gameObject.GetComponent<Tile>();
+            if (tileHit.GetColor() == this.GetColor())
+            {
+                print("To this tile's " + direction.ToString() + " there is a tile that is the same color");
+            }
+        }
+
+    }
+}
+
+
+// cardinal directions because then we don't have to ask 'who's left? mine or yours?' 
+// and also sounds smortor
+public enum Direction
+{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
 }
