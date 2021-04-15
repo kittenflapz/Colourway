@@ -5,25 +5,44 @@ using UnityEngine;
 public class Tile : MonoBehaviour
 {
     Renderer tileRenderer;
-
     List<Color> colors;
+
+    TileManager tileManager;
+
+    [SerializeField]
+    bool isStartTile;
+
+    [SerializeField]
+    bool isEndTile;
+
+    [SerializeField]
+    int startColorIndex;
+
+    public bool hasBeenCheckedThisRound = false;
 
     int colorIndex;
     private void Awake()
     {
+        tileManager = FindObjectOfType<TileManager>();
         tileRenderer = GetComponent<Renderer>();
         colors = new List<Color>() 
         { 
             Color.red,
             Color.blue,
             Color.yellow,
+            Color.green,
+            Color.white,
         };
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        colorIndex = Random.Range(0, colors.Count);
+        if (!isStartTile && !isEndTile)
+        {
+            colorIndex = Random.Range(1, colors.Count);
+        }
+
         SetTileColor(colorIndex);
     }
 
@@ -35,14 +54,14 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
+        tileManager.ClearCheckedFlags();
         IncrementColorIndex();
         SetTileColor(colorIndex);
-        CheckMyNeighbours();
+        tileManager.CheckWin();
     }
     
     private void SetTileColor(int colorIndex)
     {
-
         tileRenderer.material.SetColor("_Color", colors[colorIndex]);
     }
 
@@ -60,14 +79,11 @@ public class Tile : MonoBehaviour
     }
 
    public void CheckMyNeighbours()
-    {
-        //todo: loop dis
-
+    { 
         CheckNeighbour(Direction.NORTH);
         CheckNeighbour(Direction.EAST);
         CheckNeighbour(Direction.SOUTH);
         CheckNeighbour(Direction.WEST);
-
     }
 
     public Color GetColor()
@@ -75,8 +91,10 @@ public class Tile : MonoBehaviour
         return colors[colorIndex];
     }
 
+    // sorry
     private void CheckNeighbour(Direction direction)
     {
+        hasBeenCheckedThisRound = true;
         Vector3 targetPosition = Vector3.zero;
         RaycastHit raycastHit;
         switch (direction)
@@ -98,13 +116,26 @@ public class Tile : MonoBehaviour
         if (Physics.Linecast(transform.position, targetPosition, out raycastHit))
         {
             Tile tileHit = raycastHit.transform.gameObject.GetComponent<Tile>();
-            if (tileHit.GetColor() == this.GetColor())
-            {
-                print("To this tile's " + direction.ToString() + " there is a tile that is the same color");
-            }
-        }
 
+            if (tileHit.hasBeenCheckedThisRound == false)
+            {
+                if (tileHit.GetColor() == this.GetColor())
+                {
+                  //  print("i am tile at " + transform.position + " and there is a tile to my " + direction + " that is the same color as me");
+                 
+                    if (tileHit.isEndTile)
+                    {
+                        print("win");
+                        return;
+                    }
+                    tileHit.CheckMyNeighbours();
+                }
+            }
+            
+        }
     }
+
+
 }
 
 
