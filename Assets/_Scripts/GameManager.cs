@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
     // UI Labels
     public TextMeshProUGUI timeLeftLabel;
     public TextMeshProUGUI timeLeftNum;
+    public TextMeshProUGUI youLostLabel;
+    public TextMeshProUGUI skillLevelLabel;
+    public GameObject startAgainButton;
 
     private bool hasGameStarted;
     public SkillLevel skillLevel;
@@ -49,10 +52,12 @@ public class GameManager : MonoBehaviour
     {
         // Initialize to the start scene
         gameState = GameState.START;
+        timeLeftLabel.gameObject.SetActive(false);
+        timeLeftNum.gameObject.SetActive(false);
+        skillLevelLabel.gameObject.SetActive(false);
 
 
-        // default if user didnt pick dropdown value
-        timeLeft = 30.0f;
+        SetTimer();
 
         // This is here so I can have whatever game objects I need be active/inactive in the editor
         // and not have to mess about before hitting play
@@ -66,6 +71,19 @@ public class GameManager : MonoBehaviour
         }
 
         hasGameStarted = false;
+    }
+
+    private void Update()
+    {
+        if (gameState != GameState.START)
+        {
+            decrementTimer();
+            if (timeLeft < 0)
+            {
+                print("lose");
+                Lose();
+            }
+        }
     }
 
 
@@ -93,14 +111,23 @@ public class GameManager : MonoBehaviour
         {
             case SkillLevel.BAD:
                 timeLeft = 30.0f;
+                skillLevelLabel.SetText("skill level: bad");
                 break;
             case SkillLevel.GOOD:
                 timeLeft = 60.0f;
+                skillLevelLabel.SetText("skill level: good");
                 break;
             case SkillLevel.EXTRA:
                 timeLeft = 1000.0f;
+                skillLevelLabel.SetText("skill level: xtra");
                 break;
         }
+    }
+
+    private void decrementTimer()
+    {
+        timeLeft -= Time.deltaTime;
+        timeLeftNum.SetText(Mathf.Floor(timeLeft).ToString());
     }
 
     // kinda lomg
@@ -117,6 +144,10 @@ public class GameManager : MonoBehaviour
             {
                 obj.SetActive(false);
             }
+
+            timeLeftLabel.gameObject.SetActive(false);
+            timeLeftNum.gameObject.SetActive(false);
+            skillLevelLabel.gameObject.SetActive(false);
         }
         else
         {
@@ -131,12 +162,7 @@ public class GameManager : MonoBehaviour
             levelTwoButton.SetActive(false);
             timeLeftLabel.gameObject.SetActive(true);
             timeLeftNum.gameObject.SetActive(true);
-
-
-            if (!hasGameStarted)
-            {
-                // initialize whatever the tilemanager needs to initialize
-            }
+            skillLevelLabel.gameObject.SetActive(true);
 
         }
     }
@@ -144,6 +170,19 @@ public class GameManager : MonoBehaviour
     public void RestartEverything()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void Lose()
+    {
+        foreach (GameObject obj in gameplayStateObjects)
+        {
+            obj.SetActive(false);
+       
+        }
+        youLostLabel.gameObject.SetActive(true);
+        startAgainButton.SetActive(true);
+        timeLeftLabel.gameObject.SetActive(false);
+        timeLeftNum.gameObject.SetActive(false);
     }
  
 }
