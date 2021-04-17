@@ -12,6 +12,13 @@ public enum GameState
     LEVEL_THREE
 }
 
+public enum SkillLevel
+{
+    BAD,
+    GOOD,
+    EXTRA
+}
+
 public class GameManager : MonoBehaviour
 {
     public GameState gameState;
@@ -25,24 +32,27 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject levelTwoButton;
 
+
+    // gameplay
+    float timeLeft;
+
+
     // UI Labels
-    //public TextMeshProUGUI currentModeText;
-    //public TextMeshProUGUI currentPoopNumText;
-    //public TextMeshProUGUI finalPoopNumText;
-    //public TextMeshProUGUI currentScansLeftText;
-    //public TextMeshProUGUI currentScoopsLeftText;
-    //public TextMeshProUGUI noScansLeftText;
-    //public TextMeshProUGUI noScoopsLeftText;
+    public TextMeshProUGUI timeLeftLabel;
+    public TextMeshProUGUI timeLeftNum;
 
     private bool hasGameStarted;
-
-  //  public TileManager tileManager;
+    public SkillLevel skillLevel;
 
     // Start is called before the first frame update
     void Start()
     {
         // Initialize to the start scene
         gameState = GameState.START;
+
+
+        // default if user didnt pick dropdown value
+        timeLeft = 30.0f;
 
         // This is here so I can have whatever game objects I need be active/inactive in the editor
         // and not have to mess about before hitting play
@@ -56,6 +66,41 @@ public class GameManager : MonoBehaviour
         }
 
         hasGameStarted = false;
+    }
+
+
+    public void SetSkillLevel(int dropdownValue)
+    {
+        switch (dropdownValue)
+        {
+            case 0:
+                skillLevel = SkillLevel.BAD;
+                break;
+            case 1:
+                skillLevel = SkillLevel.GOOD;
+                break;
+            case 2:
+                skillLevel = SkillLevel.EXTRA;
+                break;
+        }
+        SetTimer();
+    }
+
+
+    public void SetTimer()
+    {
+        switch(skillLevel)
+        {
+            case SkillLevel.BAD:
+                timeLeft = 30.0f;
+                break;
+            case SkillLevel.GOOD:
+                timeLeft = 60.0f;
+                break;
+            case SkillLevel.EXTRA:
+                timeLeft = 1000.0f;
+                break;
+        }
     }
 
     // kinda lomg
@@ -84,6 +129,8 @@ public class GameManager : MonoBehaviour
             // start level one
             gameplayStateObjects[0].SetActive(true);
             levelTwoButton.SetActive(false);
+            timeLeftLabel.gameObject.SetActive(true);
+            timeLeftNum.gameObject.SetActive(true);
 
 
             if (!hasGameStarted)
