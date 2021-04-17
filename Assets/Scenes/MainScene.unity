@@ -3026,6 +3026,9 @@ MonoBehaviour:
   - {fileID: 269461573}
   gameplayStateObjects:
   - {fileID: 477178765}
+  - {fileID: 2099848318}
+  - {fileID: 1476745202}
+  levelTwoButton: {fileID: 1567242857}
 --- !u!4 &771617583
 Transform:
   m_ObjectHideFlags: 0

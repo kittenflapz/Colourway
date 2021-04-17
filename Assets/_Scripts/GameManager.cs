@@ -7,7 +7,9 @@ using TMPro;
 public enum GameState
 {
     START,
-    GAMEPLAY
+    LEVEL_ONE,
+    LEVEL_TWO,
+    LEVEL_THREE
 }
 
 public class GameManager : MonoBehaviour
@@ -18,6 +20,10 @@ public class GameManager : MonoBehaviour
     // Each of these lists holds the gameobjects for each gameplay state
     public List<GameObject> startStateObjects;
     public List<GameObject> gameplayStateObjects;
+
+    // honestly just laziness
+    [SerializeField]
+    GameObject levelTwoButton;
 
     // UI Labels
     //public TextMeshProUGUI currentModeText;
@@ -55,7 +61,7 @@ public class GameManager : MonoBehaviour
     // kinda lomg
     public void ToggleGameState()
     {
-        if (gameState == GameState.GAMEPLAY)
+        if (gameState != GameState.START)
         {
             gameState = GameState.START;
             foreach (GameObject obj in startStateObjects)
@@ -69,15 +75,16 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            gameState = GameState.GAMEPLAY;
+            gameState = GameState.LEVEL_ONE;
             foreach (GameObject obj in startStateObjects)
             {
                 obj.SetActive(false);
             }
-            foreach (GameObject obj in gameplayStateObjects)
-            {
-                obj.SetActive(true);
-            }
+
+            // start level one
+            gameplayStateObjects[0].SetActive(true);
+            levelTwoButton.SetActive(false);
+
 
             if (!hasGameStarted)
             {
