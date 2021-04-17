@@ -42,22 +42,24 @@ public class Tile : MonoBehaviour
         {
             colorIndex = Random.Range(1, colors.Count);
         }
+        else
+        {
+            colorIndex = startColorIndex;
+        }
 
         SetTileColor(colorIndex);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     private void OnMouseDown()
     {
-        tileManager.ClearCheckedFlags();
-        IncrementColorIndex();
-        SetTileColor(colorIndex);
-        tileManager.CheckWin();
+        if (!isStartTile && !isEndTile)
+        {
+            tileManager.ClearCheckedFlags();
+            IncrementColorIndex();
+            SetTileColor(colorIndex);
+            tileManager.CheckWin();
+        }
     }
     
     private void SetTileColor(int colorIndex)
@@ -94,38 +96,43 @@ public class Tile : MonoBehaviour
     // sorry
     private void CheckNeighbour(Direction direction)
     {
+       
+        print("start of check funciton");
         hasBeenCheckedThisRound = true;
         Vector3 targetPosition = Vector3.zero;
         RaycastHit raycastHit;
         switch (direction)
         {
             case Direction.NORTH:
-                targetPosition = new Vector3(transform.position.x, transform.position.y + 3, transform.position.z);
+                targetPosition = new Vector3(transform.position.x, transform.position.y + 3, 0);
                 break;
             case Direction.EAST:
-                targetPosition = new Vector3(transform.position.x + 3, transform.position.y, transform.position.z);
+                targetPosition = new Vector3(transform.position.x + 3, transform.position.y, 0);
                 break;
             case Direction.SOUTH:
-                targetPosition = new Vector3(transform.position.x, transform.position.y - 3, transform.position.z);
+                targetPosition = new Vector3(transform.position.x, transform.position.y - 3, 0);
                 break;
             case Direction.WEST:
-                targetPosition = new Vector3(transform.position.x - 3, transform.position.y, transform.position.z);
+                targetPosition = new Vector3(transform.position.x - 3, transform.position.y, 0);
                 break;
         }
-
+        Debug.DrawLine(transform.position, targetPosition, Color.red);
         if (Physics.Linecast(transform.position, targetPosition, out raycastHit))
         {
+            print("linecast hit");
             Tile tileHit = raycastHit.transform.gameObject.GetComponent<Tile>();
 
             if (tileHit.hasBeenCheckedThisRound == false)
             {
+                print("checking");
                 if (tileHit.GetColor() == this.GetColor())
                 {
-                  //  print("i am tile at " + transform.position + " and there is a tile to my " + direction + " that is the same color as me");
-                 
+                      print("i am tile at " + transform.position + " and there is a tile to my " + direction + " that is the same color as me");
+                
                     if (tileHit.isEndTile)
                     {
                         print("win");
+                        tileManager.ActivateNextLevelButton();
                         return;
                     }
                     tileHit.CheckMyNeighbours();

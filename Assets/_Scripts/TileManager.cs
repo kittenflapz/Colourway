@@ -8,6 +8,9 @@ public class TileManager : MonoBehaviour
     GameObject tilePrefab;
 
     [SerializeField]
+    GameObject nextLevelButton;
+
+    [SerializeField]
     Vector3 tileStartPosition;
 
     [SerializeField]
@@ -24,6 +27,8 @@ public class TileManager : MonoBehaviour
 
     List<GameObject> tiles;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,10 +36,9 @@ public class TileManager : MonoBehaviour
         InstantiateTiles();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ActivateNextLevelButton()
     {
-        
+        nextLevelButton.SetActive(true);
     }
 
     void InstantiateTiles()
@@ -48,7 +52,21 @@ public class TileManager : MonoBehaviour
                 newTile.transform.Rotate(Vector3.left, 90);
                 newTile.transform.parent = this.transform;
                 tiles.Add(newTile);
+
+             
             }
+        }
+        // so horrible lol
+        if (columnCount > 3)
+        {
+            int spacesToMove = columnCount - 3;
+            transform.position = new Vector3(transform.position.x - (spacesToMove), transform.position.y, transform.position.z);
+        }
+        // so horrible lol
+        if (rowCount > 3)
+        {
+            int spacesToMove = rowCount - 3;
+            transform.position = new Vector3(transform.position.x, transform.position.y - (spacesToMove), transform.position.z);
         }
     }
     
